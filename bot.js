@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { steps } = require('./scenario')
+const { steps } = require('./scenarioSection')
 const token = process.env.TOKEN
 const TelegramBot = require('node-telegram-bot-api');
 const { prepareText } = require('./scenarioService');
@@ -34,8 +34,10 @@ bot.on('callback_query', (query) => {
         else if(prefix === 'a'){
             const [, stepId, questionId, answerId] = query.data.split(',')
             const answer = steps[stepId]
+
                 .questions[questionId]
                 .buttons[answerId]
+            
             bot.sendMessage(query.message.chat.id, `Вы ответили: ${answer}`)
         }
     } catch (error) {
