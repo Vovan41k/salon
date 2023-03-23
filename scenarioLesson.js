@@ -29,7 +29,18 @@ const steps = [{
         text: 'Что хочешь изучить?',
         answerStoreField: 'course',
     }],
+}, {
+    name: 'Подтверждение',
+    questions: [{
+        text: ['Подтвердите данные',
+            'Ваше имя {name}',
+            'Ваша электронная почта {mail}',
+            'Вы используете {tools}',
+            'Ваш уровень знаний {knowledgeLvl}',
+            ' Вы хотите изучить {course}',
+        ],
+    }]
 },]
-module.exports={
-    steps:steps,
+module.exports = {
+    steps: steps,
 }

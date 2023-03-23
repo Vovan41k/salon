@@ -29,7 +29,20 @@ const steps = [{
         text: 'Какого числа вы начнете ходить?',
         answerStoreField: 'date'
     }],
+},{
+    name: 'Подтверждение',
+    questions: [{
+        text: ['Подтвердите информацию',
+        'Вашему ребенку {age} лет',
+        'Вас зовут {nameParent}',
+        'Ваш номер телефона {phoneNumber}',
+        'Вы хотите записаться на {section}',
+        'Начнете ходить {date}'
+        ],
+        buttons:['Да','Нет'],
+    }]
 },]
+
 module.exports = {
     steps:steps,
 }

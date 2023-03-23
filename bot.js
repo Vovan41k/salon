@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { steps } = require('./scenarioSection')
+const { steps } = require('./scenarioLesson')
 const token = process.env.TOKEN
 const TelegramBot = require('node-telegram-bot-api');
 const { prepareText } = require('./scenarioService');
@@ -10,7 +10,7 @@ const userInfo = {
 
 const bot = new TelegramBot(token, { polling: true });
 bot.onText(/\/start/, (msg, match) => {
-    bot.sendMessage(msg.chat.id, 'Добрый день! Я - бот записи в салон красоты... С моей помощью вы можете записаться на стрижку к нам!',
+    bot.sendMessage(msg.chat.id, 'Здравствуйте, здесь вы можете записаться к нам!',
         {
             "reply_markup": {
                 "inline_keyboard": [[
@@ -26,60 +26,81 @@ bot.onText(/\/start/, (msg, match) => {
 bot.on('callback_query', (query) => {
     try {
         const [prefix] = query.data.split(`,`)
+        const chatId = query.message.chat.id
         if (prefix === 'c') {
             // bot.sendMessage('Как вас зовут?')
-            bot.sendMessage(query.message.chat.id, steps[0].questions[0].text)
             userInfo.stage = [0, 0]
+            userInfo.answers = {}
+            processAnswer(chatId, 0, -1);
         }
-        else if(prefix === 'a'){
+        else if (prefix === 'a') {
             const [, stepId, questionId, answerId] = query.data.split(',')
             const answer = steps[stepId]
-
                 .questions[questionId]
                 .buttons[answerId]
-            
-            bot.sendMessage(query.message.chat.id, `Вы ответили: ${answer}`)
+            const answerStoreField = steps[stepId].questions[questionId].answerStoreField
+            userInfo.answers[answerStoreField] = answer
+            processAnswer(chatId, +stepId, +questionId)
+
+            // bot.sendMessage(query.message.chat.id, `Вы ответили: ${answer}`)
         }
     } catch (error) {
         console.log(error)
         bot.sendMessage(query.message.chat.id, 'Произошла ошибка')
     }
 })
+
+
+const processAnswer = (
+    chatId, stepId, questionId) => {
+    if (steps[stepId].questions.length > questionId + 1) {
+        questionId += 1;
+    } else {
+        stepId += 1;
+        questionId = 0;
+        if (stepId === steps.length) {
+            bot.sendMessage(chatId, 'Опрос завершен')
+            stepId=0 //@todo завершить опрос
+            return
+        }
+    }
+    console.log(stepId)
+    const question = steps[stepId].questions[questionId]
+    let options = {}
+    if (question.buttons) {
+        const buttons = question.buttons.map((str, i) => {
+            return {
+                text: str,
+                callback_data: `a,${stepId},${questionId},${i}`,
+            }
+        })
+        options = {
+            "reply_markup": {
+                "inline_keyboard": [buttons]
+            }
+        }
+    }
+
+    bot.sendMessage(
+        chatId,
+        prepareText(question.text, userInfo.answers),
+        options,
+    )
+    userInfo.stage = [stepId, questionId]
+}
 bot.on('message', (msg) => {
     try {
+        if (!msg?.text || msg.text.startsWith('/')) return;
         const chatId = msg.chat.id
         let [stepId, questionId] = userInfo.stage
         const answerStoreField = steps[stepId].questions[questionId].answerStoreField
         userInfo.answers[answerStoreField] = msg.text
-        if (steps[stepId].questions.length>questionId+1){
-            questionId += 1;
-        } else{
-            stepId += 1;
-            questionId = 0;
+        processAnswer(chatId, +stepId, +questionId)
+        if (stepId + 1 === steps.length) {
+            bot.sendMessage(chatId, 'Опрос завершен')
         }
-        const question = steps[stepId].questions[questionId]
-        let options = {}
-        if(question.buttons){
-            const buttons = question.buttons.map((str, i) => {
-                return {
-                    text: str,
-                    callback_data: `a,${stepId},${questionId},${i}`,
-                }
-            })
-            options = {
-                "reply_markup": {
-                    "inline_keyboard": [buttons]
-                }
-            }
-        }
-        
-        bot.sendMessage(
-            chatId,
-            prepareText(question.text,userInfo.answers),
-            options,
-        )
-        console.log({ stepId, questionId })
-        userInfo.stage = [stepId, questionId]
+
+
     } catch (error) {
         console.log(error)
         bot.sendMessage(msg.chat.id, 'Произошла ошибка')
