@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { steps } = require('./scenarioLesson')
+const { steps } = require('./scenarioBrief')
 const token = process.env.TOKEN
 const TelegramBot = require('node-telegram-bot-api');
 const { prepareText } = require('./scenarioService');
@@ -44,6 +44,13 @@ bot.on('callback_query', (query) => {
 
             // bot.sendMessage(query.message.chat.id, `Вы ответили: ${answer}`)
         }
+        else if (prefix === 'ma') {
+            const [, stepId, questionId, answerId] = query.data.split(',')
+            const answer = steps[stepId]
+                .questions[questionId]
+                .buttons[answerId]
+            bot.sendMessage(chatId, `Вы отметили ${answer}`)
+        }
     } catch (error) {
         console.log(error)
         bot.sendMessage(query.message.chat.id, 'Произошла ошибка')
@@ -60,7 +67,7 @@ const processAnswer = (
         questionId = 0;
         if (stepId === steps.length) {
             bot.sendMessage(chatId, 'Опрос завершен')
-            stepId=0 //@todo завершить опрос
+            stepId = 0 //@todo завершить опрос
             return
         }
     }
@@ -68,15 +75,28 @@ const processAnswer = (
     const question = steps[stepId].questions[questionId]
     let options = {}
     if (question.buttons) {
-        const buttons = question.buttons.map((str, i) => {
+        let prefix = 'a'
+        if (question.type === 'multi') {
+            prefix = 'ma'
+        }
+        const cButtons = [...question.buttons]
+        const buttons = cButtons.map((str, i) => {
             return {
                 text: str,
-                callback_data: `a,${stepId},${questionId},${i}`,
+                callback_data: `${prefix},${stepId},${questionId},${i}`,
             }
         })
+        if (question.type === 'multi') {
+            buttons.push({
+                text: 'Применить',
+                callback_data: `a,${stepId},${questionId},${buttons.length - 1}`,
+            })
+        }
         options = {
             "reply_markup": {
-                "inline_keyboard": [buttons]
+                "inline_keyboard": question.vertical ? buttons.map((button) => {
+                    return [button]
+                }) : [buttons]
             }
         }
     }
