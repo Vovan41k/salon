@@ -1,8 +1,8 @@
 require('dotenv').config()
-const { steps } = require('./scenarioBrief')
+const { steps } = require('./scenarioSites/scenarioEshop')
 const token = process.env.TOKEN
 const TelegramBot = require('node-telegram-bot-api');
-const { prepareText } = require('./scenarioService');
+const { prepareText } = require('./scenarioServices/scenarioService');
 const userInfo = {
     stage: [0, 0],
     answers: {}
@@ -116,10 +116,6 @@ bot.on('message', (msg) => {
         const answerStoreField = steps[stepId].questions[questionId].answerStoreField
         userInfo.answers[answerStoreField] = msg.text
         processAnswer(chatId, +stepId, +questionId)
-        if (stepId + 1 === steps.length) {
-            bot.sendMessage(chatId, 'Опрос завершен')
-        }
-
 
     } catch (error) {
         console.log(error)
