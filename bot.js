@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { steps } = require('./scenarioSites/scenarioEshop')
+const { steps } = require('./scenarioSites/scenarioBrief')
 const token = process.env.TOKEN
 const TelegramBot = require('node-telegram-bot-api');
 const { prepareText } = require('./scenarioServices/scenarioService');

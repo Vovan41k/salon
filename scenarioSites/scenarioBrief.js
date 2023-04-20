@@ -19,21 +19,6 @@ const steps = [{
         text:'Название компании',
         answerStoreField: 'nameCompany',
     },{
-        text:'Сайт вашей компании',
-        answerStoreField: 'siteCompany',
-    },{
-        text:'Область деятельности, направления бизнеса',
-        answerStoreField: 'sphereCompany',
-    },{
-        text:'География работы',
-        answerStoreField: 'geography',
-    },{
-        text:'Сроки разработки',
-        answerStoreField: 'term',
-    },{
-        text:'Бюджет',
-        answerStoreField: 'budget',
-    },{
         text:'Ответственное лицо',
         answerStoreField: 'responsiblePerson',
     }]

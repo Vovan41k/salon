@@ -22,31 +22,22 @@ const steps = [{
         text: 'Какие товары или услуги представяете',
         answerStoreField: 'product',
     }, {
-        text: 'Примеры ваших конкурентов',
-        answerStoreField: 'competitors',
-    }, {
         text: 'Ваша целевая аудитория',
         answerStoreField: 'auditory',
     }, {
         text: 'Были ли у вас раньше компании',
         answerStoreField: 'experience',
     }, {
-        text: 'Как вы будете продавать товар',
-        answerStoreField: 'delivery',
-    },{
-        text:'Количество и характеристика товара',
-        answerStoreField:'quantity',   
-    },{
-        text:'Способы оплаты',
-        answerStoreField: 'paymentMethods',   
-    },{
-        text:'Интеграции',
-        answerStoreField:'integration',   
-    },{
-        text:'Дополнительные услуги',
-        answerStoreField:'additionalServices',   
+        text: 'Количество товара',
+        answerStoreField: 'quantity',
+    }, {
+        text: 'Способы оплаты',
+        answerStoreField: 'paymentMethods',
+    }, {
+        text: 'Доставка',
+        answerStoreField: 'delivery'
     }]
 }]
-module.exports={
-    steps:steps,
+module.exports = {
+    steps: steps,
 }
